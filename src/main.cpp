@@ -8,8 +8,9 @@ constexpr int BASE_H = 720;
 int main()
 {   
     SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
-    InitWindow(1280, 720, "Swarm");
+    InitWindow(BASE_W, BASE_H, "Swarm");
     SetTargetFPS(60);
+
 
     ChangeDirectory(TextFormat("%s../assets/images", GetApplicationDirectory()));
 
@@ -19,12 +20,39 @@ int main()
     RenderTexture2D canvas = LoadRenderTexture(BASE_W, BASE_H);
     SetTextureFilter(canvas.texture, TEXTURE_FILTER_BILINEAR);
 
+    float mapW = (float)background.width;
+    float mapH = (float)background.height;
+    float halfW = BASE_W * 0.5f;
+    float halfH = BASE_H * 0.5f;
+
+
+    Camera2D camera = {};
+    camera.zoom = 1.0f;
+    camera.target = {400.0f, 400.0f};
+    camera.offset = {halfW, halfH};
+
     while (!WindowShouldClose())
-    {
+    {   
+        float dt = GetFrameTime();
+
+        float movex = (IsKeyDown(KEY_D) ? 1.0f : 0.0f) - (IsKeyDown(KEY_A) ? 1.0f : 0.0f);
+        float movey = (IsKeyDown(KEY_S) ? 1.0f : 0.0f) - (IsKeyDown(KEY_W) ? 1.0f : 0.0f);
+
+        camera.target.x += dt * 300.0f * movex;
+        camera.target.y += dt * 300.0f * movey;
+
+        camera.target.x = std::clamp(camera.target.x, halfW, mapW - halfW);
+        camera.target.y = std::clamp(camera.target.y, halfW, mapH - halfH);
+
         BeginTextureMode(canvas);
+        ClearBackground(BLACK);
+        BeginMode2D(camera);
           DrawTexture(background, 0, 0, WHITE);
           DrawTexture(walls, 0, 0, WHITE);
-          DrawText("It works!", 24, 24, 20, WHITE);
+        EndMode2D();
+        DrawRectangle(0, BASE_H - 32, BASE_W, 32, ColorAlpha(DARKBLUE, 0.6f));
+        const char *labelText = TextFormat("Camera:%0.f, %0.f", camera.target.x, camera.target.y);
+        DrawText(labelText, 12, BASE_H -24, 20, LIME);
         EndTextureMode();
 
         float scale = std::min(
@@ -35,7 +63,7 @@ int main()
         float offsetX = (GetScreenWidth() - BASE_W * scale) * 0.5f;
         float offsetY = (GetScreenHeight() - BASE_H * scale) * 0.5f;
 
-        Rectangle src = {0, 0, (float)BASE_W, float(BASE_H)};
+        Rectangle src = {0, 0, (float)BASE_W, -float(BASE_H)};
         Rectangle dest = {offsetX, offsetY, BASE_W* scale, BASE_H * scale};
 
         BeginDrawing();
