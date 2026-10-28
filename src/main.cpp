@@ -1,7 +1,9 @@
 #include "raylib.h"
 #include <algorithm>
+#include "raymath.h"
 #include "collisionmap.hpp"
 #include "gameconfig.hpp"
+#include "gameinput.hpp"
 #include "player.hpp"
 
 
@@ -10,6 +12,7 @@ int main()
     SetConfigFlags(FLAG_WINDOW_RESIZABLE); 
     InitWindow(GameConfig::BASE_W, GameConfig::BASE_H, "Swarm");
     SetTargetFPS(60);
+    DisableCursor();
 
 
     ChangeDirectory(TextFormat("%s../assets/images", GetApplicationDirectory()));
@@ -44,12 +47,11 @@ int main()
     {   
         if(IsKeyDown(KEY_Q)) Sprite::showDebug = !Sprite::showDebug;
 
+        GI::get().Update();
+
         float dt = GetFrameTime();
 
-        float movex = (IsKeyDown(KEY_D) ? 1.0f : 0.0f) - (IsKeyDown(KEY_A) ? 1.0f : 0.0f);
-        float movey = (IsKeyDown(KEY_S) ? 1.0f : 0.0f) - (IsKeyDown(KEY_W) ? 1.0f : 0.0f);
-
-        player.Update({movex, movey}, dt);
+        player.Update(dt);
 
         camera.target = player.GetPosition();
 
@@ -66,8 +68,9 @@ int main()
         DrawRectangle(0, GameConfig::BASE_H - 32, GameConfig::BASE_W, 32, ColorAlpha(DARKBLUE, 0.6f));
         DrawText(TextFormat("Player: %.0f,%.0f", player.GetPosition().x, player.GetPosition().y), 12, GameConfig::BASE_H - 24, 20, LIME);
         DrawText(TextFormat("Camera: %.0f,%.0f", camera.target.x, camera.target.y), 256, GameConfig::BASE_H - 24, 20, LIME);
-        DrawText(TextFormat("Map: %.0f,%.0f", mapW, mapH), 512, GameConfig::BASE_H - 24, 20, LIME);
+        DrawText(TextFormat("Aim: %.1f", GI::get().State().aimAngle), 512, GameConfig::BASE_H - 24, 20, LIME);
         EndTextureMode();
+        
 
         float scale = std::min(
           (float)GetScreenWidth() / GameConfig::BASE_W,

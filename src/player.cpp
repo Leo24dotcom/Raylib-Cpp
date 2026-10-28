@@ -1,15 +1,17 @@
 #include "player.hpp"
 #include "gameconfig.hpp"
+#include "gameinput.hpp"
 
 Player::Player(Texture2D* tex)
 {
   _sprite.Init(tex);
+  _sprite.pivot = GameConfig::PLAYER_PIVOT;
   _transform.scale = GameConfig::PLAYER_SCALE;
   _movement.speed = GameConfig::PLAYER_SPEED;
 }
 
-void Player::Update(Vector2 moveDir, float delta){
-  _movement.Update(_transform, moveDir, delta, _collisionMap);
+void Player::Update(float delta){
+  _movement.Update(_transform, GI::get().State(),delta, _collisionMap);
 }
 
 void Player::SetPosition(Vector2 position)
