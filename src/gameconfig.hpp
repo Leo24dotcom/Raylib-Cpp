@@ -7,4 +7,7 @@ namespace GameConfig{
   //player
   constexpr float PLAYER_SCALE = 0.3f;
   constexpr float PLAYER_SPEED = 200.0f;
+
+  //collision
+  constexpr unsigned char WALKABLE_THRESHOLD = 240;
 }

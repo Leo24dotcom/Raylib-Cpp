@@ -5,6 +5,8 @@
 #include "Sprite.hpp"
 #include "movement.hpp"
 
+class CollisionMap;
+
 class Player
 {
   public:
@@ -17,8 +19,11 @@ class Player
 
     void SetPosition(Vector2 positon);
 
+    void SetCollisionMap(const CollisionMap *collisionMap);
+
   private:
     Transform2D _transform;
     Sprite _sprite;
     Movement _movement;
+    const CollisionMap *_collisionMap = nullptr;
 };

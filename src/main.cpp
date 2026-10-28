@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include <algorithm>
+#include "collisionmap.hpp"
 #include "gameconfig.hpp"
 #include "player.hpp"
 
@@ -16,6 +17,10 @@ int main()
     Texture2D background = LoadTexture("Floor.png");
     Texture2D walls = LoadTexture("Walls.png");
     Texture2D playerTex = LoadTexture("survivor-idle_shotgun_0.png");
+    Image collisonImg = LoadImage("gameBgCollision.png");
+    CollisionMap collisionMap;
+    collisionMap.Init(&collisonImg);
+
 
     RenderTexture2D canvas = LoadRenderTexture(GameConfig::BASE_W, GameConfig::BASE_H);
     SetTextureFilter(canvas.texture, TEXTURE_FILTER_BILINEAR);
@@ -27,6 +32,7 @@ int main()
 
     Player player(&playerTex);
     player.SetPosition({mapW * 0.5f, mapH * 0.5f});
+    player.SetCollisionMap(&collisionMap);
 
     Camera2D camera = {};
     camera.zoom = 1.0f;
@@ -48,7 +54,7 @@ int main()
         camera.target = player.GetPosition();
 
         camera.target.x = std::clamp(camera.target.x, halfW, mapW - halfW);
-        camera.target.y = std::clamp(camera.target.y, halfW, mapH - halfH);
+        camera.target.y = std::clamp(camera.target.y, halfH, mapH - halfH);
 
         BeginTextureMode(canvas);
         ClearBackground(BLACK);
@@ -84,6 +90,7 @@ int main()
     UnloadTexture(walls);
     UnloadTexture(playerTex);
     UnloadRenderTexture(canvas);
+    UnloadImage(collisonImg);
     CloseWindow();
     return 0;
 }
